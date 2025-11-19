@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Send, Bot, Loader2 } from 'lucide-react';
+import { Send, Bot, Sparkles, Zap } from 'lucide-react';
 
 interface Message {
   id: number;
@@ -45,8 +44,7 @@ function App() {
 
     try {
       const response = await axios({
-        url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={YOUR API KEY}',
-        
+        url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDkWiSorvtIEVEyj7cjT_XYfbb-QEKoino',
         method: 'post',
         data: {
           system_instruction: {
@@ -95,91 +93,85 @@ function App() {
   };
 
   return (
-    <div className="min-vh-100 d-flex flex-column" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+    <div className="app-container">
       {/* Header */}
-      <header className="text-white py-3 shadow-sm header-gradient">
-        <div className="container">
-          <div className="d-flex align-items-center justify-content-between">
-            <h1 className="h4 mb-0 fw-bold">AI Chat Assistant</h1>
-            <div className="badge bg-white text-primary px-3 py-2">
-              {isLoading ? 'Thinking...' : 'Online'}
-            </div>
+      <header className="app-header">
+        <div className="brand">
+          <div className="brand-icon">
+            <Sparkles size={28} />
           </div>
+          <h1 className="brand-title">AI Assistant</h1>
+        </div>
+        <div className="status-badge">
+          <div className={`status-dot ${isLoading ? 'thinking' : ''}`} />
+          <span>{isLoading ? 'Thinking...' : 'Online'}</span>
         </div>
       </header>
 
-      {/* Chat Container */}
-      <div className="flex-grow-1 container py-4 overflow-hidden d-flex flex-column">
-        <div className="card shadow-sm flex-grow-1 d-flex flex-column" style={{ background: '#fff', borderRadius: '12px' }}>
-          {/* Messages Area */}
-          <div className="flex-grow-1 p-4 overflow-auto message-container" style={{ maxHeight: 'calc(100vh - 250px)' }}>
-            {messages.length === 0 ? (
-              <div className="h-100 d-flex flex-column align-items-center justify-content-center text-muted">
-                <Bot size={48} className="mb-3 text-primary" />
-                <h2 className="h4 mb-2">How can I help you today?</h2>
-                <p className="text-center text-muted">Ask me anything, and I'll do my best to assist you.</p>
+      {/* Chat Card */}
+      <div className="chat-card">
+        {/* Messages Area */}
+        <div className="messages-area">
+          {messages.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">
+                <Bot size={64} strokeWidth={1.5} />
               </div>
-            ) : (
-              <div className="d-flex flex-column gap-3">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`d-flex ${message.sender === 'user' ? 'justify-content-end' : 'justify-content-start'}`}
-                  >
-                    <div
-                      className={`message-bubble ${message.sender === 'user' ? 'user-message' : 'bot-message'}`}
-                    >
-                      <div className="message-text">
-                        {message.text}
-                      </div>
-                      <div className="message-time">
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="d-flex justify-content-start">
-                    <div className="message-bubble bot-message loading-bubble">
-                      <Loader2 className="animate-spin text-primary" size={18} />
-                      <span className="text-muted small ms-2">Thinking...</span>
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-            )}
-          </div>
-
-          {/* Input Area */}
-          <div className="border-top p-3 bg-white" style={{ borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', borderColor: '#f0f0f0' }}>
-            <div className="input-group rounded-lg" style={{ overflow: 'hidden', boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)' }}>
-              <input
-                type="text"
-                className="form-control border-0 py-3 ps-4"
-                placeholder="Type your message..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && generateAnswers()}
-                disabled={isLoading}
-                style={{ boxShadow: 'none', fontSize: '0.95rem' }}
-              />
-              <button
-                className="btn d-flex align-items-center gap-2 px-4 fw-500"
-                onClick={generateAnswers}
-                disabled={isLoading || !input.trim()}
-                style={{
-                  background: isLoading || !input.trim() ? '#ccc' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  border: 'none',
-                  color: 'white',
-                }}
-              >
-                <Send size={18} />
-                <span className="d-none d-sm-inline">Send</span>
-              </button>
+              <h2>How can I help you today?</h2>
+              <p>Ask me anything, and I'll do my best to assist you.</p>
             </div>
-            <div className="text-muted small mt-2 text-center" style={{ fontSize: '0.8rem' }}>
-              AI Assistant Bot by Saquib. AI may produce inaccurate information.</div>
+          ) : (
+            <>
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`message-wrapper ${message.sender}`}
+                >
+                  <div className={`message-bubble ${message.sender}`}>
+                    <div className="message-text">{message.text}</div>
+                    <div className="message-time">
+                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {isLoading && (
+                <div className="message-wrapper bot">
+                  <div className="message-bubble bot">
+                    <div className="flex items-center gap-2">
+                      <Zap className="animate-spin text-yellow-400" size={16} />
+                      <span className="text-sm opacity-70">Generating response...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </>
+          )}
+        </div>
+
+        {/* Input Area */}
+        <div className="input-area">
+          <div className="input-group">
+            <input
+              type="text"
+              className="chat-input"
+              placeholder="Type your message..."
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && generateAnswers()}
+              disabled={isLoading}
+            />
+            <button
+              className="send-btn"
+              onClick={generateAnswers}
+              disabled={isLoading || !input.trim()}
+            >
+              <Send size={20} />
+            </button>
+          </div>
+          <div className="footer-text">
+            Saquib's AI Assistant Bot. AI may produce inaccurate information.
           </div>
         </div>
       </div>
