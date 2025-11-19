@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 import { Send, Bot, Sparkles, Zap } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface Message {
   id: number;
@@ -48,7 +50,7 @@ function App() {
         method: 'post',
         data: {
           system_instruction: {
-            parts: [{ text: 'You are a helpful, concise assistant developed by Saquib using Google\'s LLM model. Keep responses brief and to the point (2-3 sentences maximum). Avoid markdown formatting and bullet points. If asked who developed you, explicitly state that you were developed by Saquib.' }],
+            parts: [{ text: 'You are a helpful assistant developed by Saquib using Google\'s LLM model. Use Markdown formatting for tables, lists, and code blocks when appropriate. If asked to tabulate data, use a Markdown table. If asked for a list, use bullet points or numbered lists. Keep responses concise but formatted.' }],
           },
           contents: [
             {
@@ -56,7 +58,7 @@ function App() {
             },
           ],
           generationConfig: {
-            maxOutputTokens: 150,
+            maxOutputTokens: 500,
             temperature: 0.7,
           },
         },
@@ -64,24 +66,8 @@ function App() {
 
       let botResponse = response.data.candidates?.[0]?.content?.parts?.[0]?.text || 'Unable to generate response.';
 
-      // Enhanced cleanup for concise responses
-      botResponse = botResponse
-        .replace(/\*\*\*\*+/g, '')
-        .replace(/\*\*/g, '')
-        .replace(/^•\s*/gm, '')
-        .replace(/^\*\s*/gm, '')
-        .replace(/^\d+\.\s*/gm, '')
-        .replace(/\n{3,}/g, '\n\n')
-        .replace(/\s*:\s*/g, ': ')
-        .replace(/\s*\n\s*\n\s*/g, '\n\n')
-        .replace(/\s*\n/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-
-      // Truncate if still too long
-      if (botResponse.length > 300) {
-        botResponse = botResponse.substring(0, 300).trim() + '...';
-      }
+      // Minimal cleanup, preserving markdown
+      botResponse = botResponse.trim();
 
       addMessage(botResponse, 'bot');
     } catch (error) {
@@ -128,7 +114,15 @@ function App() {
                   className={`message-wrapper ${message.sender}`}
                 >
                   <div className={`message-bubble ${message.sender}`}>
-                    <div className="message-text">{message.text}</div>
+                    <div className="message-text">
+                      {message.sender === 'bot' ? (
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {message.text}
+                        </ReactMarkdown>
+                      ) : (
+                        message.text
+                      )}
+                    </div>
                     <div className="message-time">
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
