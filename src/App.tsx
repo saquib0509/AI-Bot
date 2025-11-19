@@ -44,11 +44,11 @@ function App() {
 
     try {
       const response = await axios({
-        url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDkWiSorvtIEVEyj7cjT_XYfbb-QEKoino',
+        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`,
         method: 'post',
         data: {
           system_instruction: {
-            parts: [{ text: 'You are a helpful, concise assistant. Keep responses brief and to the point (2-3 sentences maximum). Avoid markdown formatting and bullet points.' }],
+            parts: [{ text: 'You are a helpful, concise assistant developed by Saquib using Google\'s LLM model. Keep responses brief and to the point (2-3 sentences maximum). Avoid markdown formatting and bullet points. If asked who developed you, explicitly state that you were developed by Saquib.' }],
           },
           contents: [
             {
